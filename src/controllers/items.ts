@@ -5,7 +5,7 @@ import { IItem, IPagination } from "../types";
 
 export const getItems = async (request: FastifyRequest<{ Querystring: IPagination & { search?: string } }>, reply: FastifyReply): Promise<void> => {
     const { skip, limit } = parsePaginationQueries(request.query);
-    const items = await ItemModel(request.server).find({
+    const items = await ItemModel.find({
         $or: [
             { name: { $regex: request.query?.search || '', $options: 'i' } },
             { description: { $regex: request.query?.search || '', $options: 'i' } },
@@ -17,38 +17,35 @@ export const getItems = async (request: FastifyRequest<{ Querystring: IPaginatio
 }
 
 export const addItem = async (request: FastifyRequest<{ Body: IItem }>, reply: FastifyReply): Promise<void> => {    
-    const item = ItemModel(request.server);
-    await item.validate(request.body);
-    const itemCreated = await item.create(request.body)
+    await ItemModel.validate(request.body);
+    const itemCreated = await ItemModel.create(request.body)
     reply
         .header('Content-Type', 'application/json;charset=utf-8')
         .send(itemCreated)
 }
 
 export const deleteItem = async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> => {
-    const item = ItemModel(request.server);
     const id = request.params.id;
-    const item_ = await item.findById(id);
-    if (!item_) {
+    const item = await ItemModel.findById(id);
+    if (!item) {
         reply.status(404);
         return;
     }
-    await item.findByIdAndDelete(id);
+    await ItemModel.findByIdAndDelete(id);
     reply
         .header('Content-Type', 'application/json;charset=utf-8')
         .send(id);
 }
 
 export const updateItem = async (request: FastifyRequest<{ Body: IItem, Params: { id: string } }>, reply: FastifyReply): Promise<void> => {
-    const item = ItemModel(request.server);
-    await item.validate(request.body);
+    await ItemModel.validate(request.body);
     const id = request.params.id;
-    const item_ = await item.findById(id);
-    if (!item_) {
+    const item = await ItemModel.findById(id);
+    if (!item) {
         reply.status(404);
         return;
     }
-    const itemUpdated = await item.findByIdAndUpdate(id, item_);
+    const itemUpdated = await ItemModel.findByIdAndUpdate(id, item);
     reply
         .header('Content-Type', 'application/json;charset=utf-8')
         .send(itemUpdated);

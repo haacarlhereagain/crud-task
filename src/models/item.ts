@@ -1,4 +1,3 @@
-import { FastifyInstance } from 'fastify';
 import mongoose from 'mongoose';
 import { IItem } from '../types';
 
@@ -40,4 +39,4 @@ export const itemSchema = new mongoose.Schema<IItem>({
     versionKey: false,
 })
 
-export const ItemModel = (fastify: FastifyInstance) => mongoose.model('item', itemSchema, 'items');
+export const ItemModel = mongoose.model('item', itemSchema, 'items');
